@@ -19,7 +19,7 @@ docker run -d --net mongo-shard-cluster --name config-svr-2 -p 27102:27017 mongo
 docker run -d --net mongo-shard-cluster --name config-svr-3 -p 27103:27017 mongo:4.4 mongod --port 27017 --configsvr --replSet config-svr-replica-set
 ```
 
-We have mentioned that all these 3 config servers belong to a replicaSet named *config-svr-replica-set*.
+All these 3 config servers belong to a replicaSet named *config-svr-replica-set*.
 
 So lets proceed and initiate this replicaSet.
 
@@ -58,9 +58,9 @@ If config-svr-1 does not respond, mongo will automatically promote one of the ot
 
 Creating shards follows a similar approach to that of creating config servers.
 
-Our goal here is to create 3 shard replicaSets. And in each replicaSet, we will have 3 shards. One of the 3 shards will be in each replicaSet will be PRIMARY and the other two will be SECONDARY. Data will be replicated across all the shards within a replicaSet.
+The goal here is to create 3 shard replicaSets. And in each replicaSet, there will be 3 shards. One of the 3 shards will be in each replicaSet will be PRIMARY and the other two will be SECONDARY. Data will be replicated across all the shards within a replicaSet.
 
-When inserting data, our router will decide in shard to insert the data. We can specify a field of our data to router. Then router hashes the value in this field and inserts data in appropriate shard.
+When inserting data, the router will decide in shard to insert the data. A field of data to router can be specified. Then router hashes the value in this field and inserts data in appropriate shard.
 
 ### Shard Replica Set 1
 ```
@@ -77,7 +77,7 @@ docker run -d --net mongo-shard-cluster --name shard-1-node-c -p 27113:27017 mon
 
 Similarly create 2 more shard replicaSets each with 3 nodes inside them.
 
-Now we have to initiate *shard-1-replica-set*.
+Now let's initiate *shard-1-replica-set*.
 
 First access mongo shell of shard-1-node(a/b/c):
 
@@ -107,7 +107,7 @@ Do not forget to create 2 more shard-replicaSets with 3 shards each.
 
 ## Creating Routers
 
-Routers will be the entrypoint for our client applications.
+Routers will be the entrypoint for client applications.
 
 ### Router 1
 ```
@@ -119,9 +119,9 @@ docker run -d --net mongo-shard-cluster --name router-1 -p 27141:27017 mongo:4.4
 docker run -d --net mongo-shard-cluster --name router-2 -p 27142:27017 mongo:4.4 mongos --port 27017 --configdb config-svr-replica-set/config-svr-1:27017,config-svr-2:27017,config-svr-3:27017 --bind_ip_all
 ```
 
-Here we also bind our config servers to router. This way router will have access to metadata of shards and can redirect query to appropriate shard.
+Here also bind the config servers to router. This way router will have access to metadata of shards and can redirect query to appropriate shard.
 
-Now we have to connected config servers and routers. Let us proceed and connect our shards to this architecture.
+Now the config servers and routers are connected. Let's proceed and connect the shards to this architecture.
 
 ## Connect Shards to Routers and Config Servers.
 
@@ -146,11 +146,11 @@ sh.addShard("shard-3-replica-set/shard-3-node-a:27017", "shard-3-replica-set/sha
 
 Why does running this command on a single router does the job ?
 
-*When creating routers, we linked them to our config servers. So, now both of our routers to config servers. When we run sh.addShard() command , it contacts with config servers and stores data there. Since all routers are in contact with config servers, we need not add the shards again to router-2.*
+*When creating routers, they were linked to the config servers. So, for both of the routers to config servers, when the sh.addShard() command is run, it contacts with config servers and stores data there. Since all routers are in contact with config servers, there is no need to add shards again to router-2.*
 
 ## Inserting and Sharding Data
 
-First let us create a database inside any one of the router with 2 collections in it.
+First let's create a database inside any one of the router with 2 collections in it.
 
 ```docker exec -it router-1 mongo```
 
