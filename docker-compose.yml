@@ -1,0 +1,288 @@
+# Full-stack DISBank: sharded Mongo cluster + N app instances + nginx LB.
+# One command brings the whole system up:  docker compose up --build
+#
+# Translated from scripts/ (IMPROVEMENT_PLAN §0.4). Topology:
+#   - 3 config servers  (config-svr-1..3)        replica set: config-svr-replica-set
+#   - 3 shards × 3 nodes (shard-{1,2,3}-node-{a,b,c})  replica sets: shard-N-replica-set
+#   - 3 mongos routers   (router-1..3)
+#   - 1 mongo-init       (one-shot: rs.initiate + addShard + shardCollection + indices)
+#   - 3 app instances    (app-1..3, built from ./Dockerfile)
+#   - 1 nginx            (single published entrypoint, round-robins the app tier)
+
+# Shared healthcheck: a node is "healthy" once mongod/mongos answers ping
+# (which happens even before rs.initiate, so it's safe for ordering the init).
+x-mongo-healthcheck: &mongo-healthcheck
+  test: ["CMD", "mongo", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+  interval: 10s
+  timeout: 5s
+  retries: 15
+  start_period: 20s
+
+services:
+  # ----------------------------------------------------------------- config servers
+  config-svr-1:
+    image: mongo:4.4
+    command: mongod --configsvr --replSet config-svr-replica-set --port 27017 --bind_ip_all
+    ports: ["27101:27017"]
+    volumes: ["config1:/data/db"]
+    healthcheck: *mongo-healthcheck
+    networks: [mongo-shard-cluster]
+
+  config-svr-2:
+    image: mongo:4.4
+    command: mongod --configsvr --replSet config-svr-replica-set --port 27017 --bind_ip_all
+    ports: ["27102:27017"]
+    volumes: ["config2:/data/db"]
+    healthcheck: *mongo-healthcheck
+    networks: [mongo-shard-cluster]
+
+  config-svr-3:
+    image: mongo:4.4
+    command: mongod --configsvr --replSet config-svr-replica-set --port 27017 --bind_ip_all
+    ports: ["27103:27017"]
+    volumes: ["config3:/data/db"]
+    healthcheck: *mongo-healthcheck
+    networks: [mongo-shard-cluster]
+
+  # ----------------------------------------------------------------- shard 1
+  shard-1-node-a:
+    image: mongo:4.4
+    command: mongod --shardsvr --replSet shard-1-replica-set --port 27017 --bind_ip_all
+    ports: ["27121:27017"]
+    volumes: ["shard1a:/data/db"]
+    healthcheck: *mongo-healthcheck
+    networks: [mongo-shard-cluster]
+  shard-1-node-b:
+    image: mongo:4.4
+    command: mongod --shardsvr --replSet shard-1-replica-set --port 27017 --bind_ip_all
+    ports: ["27122:27017"]
+    volumes: ["shard1b:/data/db"]
+    healthcheck: *mongo-healthcheck
+    networks: [mongo-shard-cluster]
+  shard-1-node-c:
+    image: mongo:4.4
+    command: mongod --shardsvr --replSet shard-1-replica-set --port 27017 --bind_ip_all
+    ports: ["27123:27017"]
+    volumes: ["shard1c:/data/db"]
+    healthcheck: *mongo-healthcheck
+    networks: [mongo-shard-cluster]
+
+  # ----------------------------------------------------------------- shard 2
+  shard-2-node-a:
+    image: mongo:4.4
+    command: mongod --shardsvr --replSet shard-2-replica-set --port 27017 --bind_ip_all
+    ports: ["27131:27017"]
+    volumes: ["shard2a:/data/db"]
+    healthcheck: *mongo-healthcheck
+    networks: [mongo-shard-cluster]
+  shard-2-node-b:
+    image: mongo:4.4
+    command: mongod --shardsvr --replSet shard-2-replica-set --port 27017 --bind_ip_all
+    ports: ["27132:27017"]
+    volumes: ["shard2b:/data/db"]
+    healthcheck: *mongo-healthcheck
+    networks: [mongo-shard-cluster]
+  shard-2-node-c:
+    image: mongo:4.4
+    command: mongod --shardsvr --replSet shard-2-replica-set --port 27017 --bind_ip_all
+    ports: ["27133:27017"]
+    volumes: ["shard2c:/data/db"]
+    healthcheck: *mongo-healthcheck
+    networks: [mongo-shard-cluster]
+
+  # ----------------------------------------------------------------- shard 3
+  shard-3-node-a:
+    image: mongo:4.4
+    command: mongod --shardsvr --replSet shard-3-replica-set --port 27017 --bind_ip_all
+    ports: ["27141:27017"]
+    volumes: ["shard3a:/data/db"]
+    healthcheck: *mongo-healthcheck
+    networks: [mongo-shard-cluster]
+  shard-3-node-b:
+    image: mongo:4.4
+    command: mongod --shardsvr --replSet shard-3-replica-set --port 27017 --bind_ip_all
+    ports: ["27142:27017"]
+    volumes: ["shard3b:/data/db"]
+    healthcheck: *mongo-healthcheck
+    networks: [mongo-shard-cluster]
+  shard-3-node-c:
+    image: mongo:4.4
+    command: mongod --shardsvr --replSet shard-3-replica-set --port 27017 --bind_ip_all
+    ports: ["27143:27017"]
+    volumes: ["shard3c:/data/db"]
+    healthcheck: *mongo-healthcheck
+    networks: [mongo-shard-cluster]
+
+  # ----------------------------------------------------------------- routers (mongos)
+  router-1:
+    image: mongo:4.4
+    command: >
+      mongos --configdb config-svr-replica-set/config-svr-1:27017,config-svr-2:27017,config-svr-3:27017
+      --port 27017 --bind_ip_all
+    ports: ["27151:27017"]
+    healthcheck: *mongo-healthcheck
+    depends_on:
+      config-svr-1: { condition: service_healthy }
+      config-svr-2: { condition: service_healthy }
+      config-svr-3: { condition: service_healthy }
+    networks: [mongo-shard-cluster]
+  router-2:
+    image: mongo:4.4
+    command: >
+      mongos --configdb config-svr-replica-set/config-svr-1:27017,config-svr-2:27017,config-svr-3:27017
+      --port 27017 --bind_ip_all
+    ports: ["27152:27017"]
+    healthcheck: *mongo-healthcheck
+    depends_on:
+      config-svr-1: { condition: service_healthy }
+      config-svr-2: { condition: service_healthy }
+      config-svr-3: { condition: service_healthy }
+    networks: [mongo-shard-cluster]
+  router-3:
+    image: mongo:4.4
+    command: >
+      mongos --configdb config-svr-replica-set/config-svr-1:27017,config-svr-2:27017,config-svr-3:27017
+      --port 27017 --bind_ip_all
+    ports: ["27153:27017"]
+    healthcheck: *mongo-healthcheck
+    depends_on:
+      config-svr-1: { condition: service_healthy }
+      config-svr-2: { condition: service_healthy }
+      config-svr-3: { condition: service_healthy }
+    networks: [mongo-shard-cluster]
+
+  # ----------------------------------------------------------------- one-shot init
+  # Waits for all data nodes to be reachable, initiates every replica set, wires
+  # the shards into router-1, shards the collections, creates the indices, and
+  # mongoimports the seed dataset (replacing config_servers.sh +
+  # create_shards.sh + connect_shards.sh + Compass + the 1.5M-row GDrive
+  # download — see IMPROVEMENT_PLAN §0.5 / scripts/seed/).
+  #
+  # SEED_DIR defaults to the small, committed sample dataset so a clean
+  # `docker compose up` needs nothing outside the repo. Point it at
+  # scripts/seed/data (gitignored) after running
+  # `node scripts/seed/generate.js` for the full ~5k-user/~50k-txn dataset.
+  mongo-init:
+    image: mongo:4.4
+    restart: "no"
+    entrypoint: ["bash", "/init/init-cluster.sh"]
+    volumes:
+      - ./scripts/init:/init:ro
+      - ${SEED_DIR:-./scripts/seed/sample}:/seed:ro
+    depends_on:
+      config-svr-1: { condition: service_healthy }
+      config-svr-2: { condition: service_healthy }
+      config-svr-3: { condition: service_healthy }
+      shard-1-node-a: { condition: service_healthy }
+      shard-1-node-b: { condition: service_healthy }
+      shard-1-node-c: { condition: service_healthy }
+      shard-2-node-a: { condition: service_healthy }
+      shard-2-node-b: { condition: service_healthy }
+      shard-2-node-c: { condition: service_healthy }
+      shard-3-node-a: { condition: service_healthy }
+      shard-3-node-b: { condition: service_healthy }
+      shard-3-node-c: { condition: service_healthy }
+    networks: [mongo-shard-cluster]
+
+  # ----------------------------------------------------------------- app tier
+  # app-1 builds the image; app-2/app-3 reuse the same tag (build once, run thrice).
+  app-1:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: cse512-disbank:local
+    environment:
+      PORT: "8080"
+      MONGO_URI: "mongodb://router-1:27017,router-2:27017,router-3:27017"
+      MONGO_READ_PREF: "secondary"
+    restart: on-failure
+    depends_on:
+      mongo-init: { condition: service_completed_successfully }
+    networks: [mongo-shard-cluster]
+  app-2:
+    image: cse512-disbank:local
+    environment:
+      PORT: "8080"
+      MONGO_URI: "mongodb://router-1:27017,router-2:27017,router-3:27017"
+      MONGO_READ_PREF: "secondary"
+    restart: on-failure
+    depends_on:
+      app-1: { condition: service_started }
+      mongo-init: { condition: service_completed_successfully }
+    networks: [mongo-shard-cluster]
+  app-3:
+    image: cse512-disbank:local
+    environment:
+      PORT: "8080"
+      MONGO_URI: "mongodb://router-1:27017,router-2:27017,router-3:27017"
+      MONGO_READ_PREF: "secondary"
+    restart: on-failure
+    depends_on:
+      app-1: { condition: service_started }
+      mongo-init: { condition: service_completed_successfully }
+    networks: [mongo-shard-cluster]
+
+  # ----------------------------------------------------------------- load balancer
+  # The single published entrypoint. Host 8080 → nginx 80 → round-robin app-N:8080,
+  # so the existing frontend (localhost:8080) keeps working with no changes.
+  nginx:
+    image: nginx:1.27-alpine
+    ports: ["8080:80"]
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      app-1: { condition: service_started }
+      app-2: { condition: service_started }
+      app-3: { condition: service_started }
+    networks: [mongo-shard-cluster]
+
+  # ----------------------------------------------------------------- observability (optional, §3.2)
+  # Scrapes each app instance's /metrics directly (prometheus/prometheus.yml)
+  # rather than through nginx, since per-instance latency/error visibility is
+  # the whole point of the horizontal-scaling story. Neither service is on
+  # the request path — bringing them down doesn't affect the app tier.
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    ports: ["9090:9090"]
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    depends_on:
+      app-1: { condition: service_started }
+      app-2: { condition: service_started }
+      app-3: { condition: service_started }
+    networks: [mongo-shard-cluster]
+
+  grafana:
+    image: grafana/grafana:11.2.0
+    ports: ["3001:3000"]
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Viewer"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./grafana/dashboards:/var/lib/grafana/dashboards:ro
+      - grafana-data:/var/lib/grafana
+    depends_on:
+      prometheus: { condition: service_started }
+    networks: [mongo-shard-cluster]
+
+networks:
+  mongo-shard-cluster:
+    driver: bridge
+
+volumes:
+  config1: {}
+  config2: {}
+  config3: {}
+  shard1a: {}
+  shard1b: {}
+  shard1c: {}
+  shard2a: {}
+  shard2b: {}
+  shard2c: {}
+  shard3a: {}
+  shard3b: {}
+  shard3c: {}
+  prometheus-data: {}
+  grafana-data: {}

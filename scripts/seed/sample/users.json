@@ -1,0 +1,272 @@
+[
+  {
+    "user_id": 100,
+    "first_name": "Coty",
+    "last_name": "Hickle",
+    "email": "Coty.Hickle@gmail.com",
+    "current_balance": 74215331,
+    "password": "$2b$10$fHKPAN0dB0w43e5SryktjON0uLPm3XOyt0ix9GKt5WsocXHk34btS",
+    "account_number": 196566273
+  },
+  {
+    "user_id": 101,
+    "first_name": "Stuart",
+    "last_name": "Beahan",
+    "email": "Stuart.Beahan31@gmail.com",
+    "current_balance": 90147803,
+    "password": "$2b$10$UtrQAs9A07zmfucadhfoEOF4veKSteH6/oCTpuFNbw.w.qYf8dDP6",
+    "account_number": 194065272
+  },
+  {
+    "user_id": 102,
+    "first_name": "Aniya",
+    "last_name": "Kohler",
+    "email": "Aniya.Kohler30@gmail.com",
+    "current_balance": 1379479,
+    "password": "$2b$10$bTey.QreK73L1epNtnyatugdX39xcHwzqMIcB1GZX9z1zVn2LfQF6",
+    "account_number": 588453495
+  },
+  {
+    "user_id": 103,
+    "first_name": "Keyshawn",
+    "last_name": "Dickinson",
+    "email": "Keyshawn.Dickinson@gmail.com",
+    "current_balance": 78236180,
+    "password": "$2b$10$DgThBwX2ZfYCngXLwjL15esl8fxrkJmutWYKiCmT9/cXcdG4gdFOW",
+    "account_number": 952576512
+  },
+  {
+    "user_id": 104,
+    "first_name": "Thaddeus",
+    "last_name": "Orn-Volkman",
+    "email": "Thaddeus_Orn-Volkman@gmail.com",
+    "current_balance": 9646848,
+    "password": "$2b$10$GgqOtsArtshjk9yDIoJ1vOEBhXNPlAM87fHK.mvNj1s2pTPm3h1DC",
+    "account_number": 399196488
+  },
+  {
+    "user_id": 105,
+    "first_name": "Esta",
+    "last_name": "Stoltenberg",
+    "email": "Esta_Stoltenberg@hotmail.com",
+    "current_balance": 21680552,
+    "password": "$2b$10$PA/FdwO6mwkBLylBhG/zA..wXofPgJjtuQmBYjXflr6oSxr9yKKjS",
+    "account_number": 719825330
+  },
+  {
+    "user_id": 106,
+    "first_name": "Tia",
+    "last_name": "Miller",
+    "email": "Tia_Miller@yahoo.com",
+    "current_balance": 92902632,
+    "password": "$2b$10$in.nmM705AlFG4TuGN2ZQOKpQuYLzpKT99l3fHpnh1j3yf/Z8qBMW",
+    "account_number": 811565876
+  },
+  {
+    "user_id": 107,
+    "first_name": "Alexys",
+    "last_name": "Zieme",
+    "email": "Alexys.Zieme@hotmail.com",
+    "current_balance": 94216861,
+    "password": "$2b$10$jnlo00Nqy6laSBD0Jh7u0.lab8J17kqkvRMHt1JP1QDW7O7DgFZPO",
+    "account_number": 593138725
+  },
+  {
+    "user_id": 108,
+    "first_name": "Jarred",
+    "last_name": "Torp",
+    "email": "Jarred_Torp@gmail.com",
+    "current_balance": 37037544,
+    "password": "$2b$10$jyS2n1oA6sk347pL/vPaNuBi1Byqsyt2egCtzoyFBD2IFPKAqS7ui",
+    "account_number": 526713358
+  },
+  {
+    "user_id": 109,
+    "first_name": "Yazmin",
+    "last_name": "Blanda",
+    "email": "Yazmin.Blanda@hotmail.com",
+    "current_balance": 58807654,
+    "password": "$2b$10$oovsVnuwfvRm3MWEdMcCreQE1lYmFW5NOJCWYEYuJas8gO8e4Q8g6",
+    "account_number": 468859304
+  },
+  {
+    "user_id": 110,
+    "first_name": "Armando",
+    "last_name": "Gorczany",
+    "email": "Armando_Gorczany20@yahoo.com",
+    "current_balance": 43228781,
+    "password": "$2b$10$hNshtHqF.iTGRVAYt7PnWuQdNmbv1RAIc/0CXqUfWkO/dqv1Lq7fm",
+    "account_number": 579403203
+  },
+  {
+    "user_id": 111,
+    "first_name": "Carolyne",
+    "last_name": "Price",
+    "email": "Carolyne.Price@yahoo.com",
+    "current_balance": 44188394,
+    "password": "$2b$10$IBWtgYriobJRlsdZ4Mx2TeLnkkD.cwG1yQ8P8z95WNPPw2U09nc36",
+    "account_number": 464422652
+  },
+  {
+    "user_id": 112,
+    "first_name": "Cornell",
+    "last_name": "Rau",
+    "email": "Cornell_Rau81@gmail.com",
+    "current_balance": 8027620,
+    "password": "$2b$10$n./zfegiwJ0W6Veu1rzPj.4Lgc7udVcNy5oExsCqi1QACJNZQFZMe",
+    "account_number": 826839587
+  },
+  {
+    "user_id": 113,
+    "first_name": "Audreanne",
+    "last_name": "Padberg",
+    "email": "Audreanne_Padberg@hotmail.com",
+    "current_balance": 88265759,
+    "password": "$2b$10$4bp2cv44jbDuMnYEt4WOvuDPvmjdeoAR/LSM5nL8eDXJY/pMYXQ36",
+    "account_number": 236756533
+  },
+  {
+    "user_id": 114,
+    "first_name": "Cheyanne",
+    "last_name": "Orn",
+    "email": "Cheyanne_Orn@gmail.com",
+    "current_balance": 91452394,
+    "password": "$2b$10$Mm3MC9r7K83/hFLZ.E.V1.HuiF1e8ifVgYe5klgF9snOsIXDvQNTK",
+    "account_number": 922375452
+  },
+  {
+    "user_id": 115,
+    "first_name": "Mariah",
+    "last_name": "Schroeder",
+    "email": "Mariah.Schroeder@gmail.com",
+    "current_balance": 93569391,
+    "password": "$2b$10$fdcKTIEeIYLQqA8FjDU69.UnR.aaq1Ly7QzddnJHDJD9gd340JiI6",
+    "account_number": 471244092
+  },
+  {
+    "user_id": 116,
+    "first_name": "Daphnee",
+    "last_name": "Kohler",
+    "email": "Daphnee.Kohler74@hotmail.com",
+    "current_balance": 64182301,
+    "password": "$2b$10$5y7tLf19YZA9Ye.XRqYwn.TtAHfKTfT37UK51vTOMiusvKmfRPH.6",
+    "account_number": 974416847
+  },
+  {
+    "user_id": 117,
+    "first_name": "Virgil",
+    "last_name": "Roob",
+    "email": "Virgil.Roob87@gmail.com",
+    "current_balance": 33622206,
+    "password": "$2b$10$5cxy8e5KYm30NhVTyaBjM..0JHDP7GJ7vJboTlM9XkL5vBsRGAxra",
+    "account_number": 348304843
+  },
+  {
+    "user_id": 118,
+    "first_name": "Gladys",
+    "last_name": "Bernier",
+    "email": "Gladys_Bernier45@yahoo.com",
+    "current_balance": 17878867,
+    "password": "$2b$10$Q0WxmFnAz7ujnOycTIlZ9u1R3YMDCWrt2ur2rOFvYDH0BTunVvY2O",
+    "account_number": 294857304
+  },
+  {
+    "user_id": 119,
+    "first_name": "Katlynn",
+    "last_name": "Marquardt",
+    "email": "Katlynn_Marquardt7@gmail.com",
+    "current_balance": 41517111,
+    "password": "$2b$10$0xij7L0zG9NqNrJkKnXe.urXMhJ8oIsJghtenbLWgtaDUGcGDqP1W",
+    "account_number": 519555974
+  },
+  {
+    "user_id": 120,
+    "first_name": "Caleigh",
+    "last_name": "Volkman",
+    "email": "Caleigh.Volkman6@gmail.com",
+    "current_balance": 56201559,
+    "password": "$2b$10$kxuiW3bwgBDf9AVPUykxzOvj2Hj5Md6PtJi2TjpajxVZF.2wFoyg.",
+    "account_number": 951512955
+  },
+  {
+    "user_id": 121,
+    "first_name": "Terrill",
+    "last_name": "Gutkowski",
+    "email": "Terrill_Gutkowski49@gmail.com",
+    "current_balance": 58055190,
+    "password": "$2b$10$FHS7/werT19ucDqd53CpVudZc1O9bxKCyBoh/0YKVWTOmeYJL8wGq",
+    "account_number": 698828771
+  },
+  {
+    "user_id": 122,
+    "first_name": "Seamus",
+    "last_name": "Parker",
+    "email": "Seamus.Parker91@hotmail.com",
+    "current_balance": 24533586,
+    "password": "$2b$10$EFuF9N70me5ZkercDBBZn.XwHQNgrQsGTzIEZ99nvH1gB4jwLfndG",
+    "account_number": 587249046
+  },
+  {
+    "user_id": 123,
+    "first_name": "Onie",
+    "last_name": "Hand",
+    "email": "Onie_Hand@yahoo.com",
+    "current_balance": 19837532,
+    "password": "$2b$10$e5htBKVbyyRswLogqGZhHunsU7ZrR9KEgDxc2Ge1PECI5NJHYRD0K",
+    "account_number": 980069827
+  },
+  {
+    "user_id": 124,
+    "first_name": "Abigail",
+    "last_name": "King",
+    "email": "Abigail_King44@hotmail.com",
+    "current_balance": 39241980,
+    "password": "$2b$10$vOkcBhkQir0LI0AwDQ3AhuqnCONntddKwsgTwu/a4WEr80QYQZ.aK",
+    "account_number": 773601043
+  },
+  {
+    "user_id": 125,
+    "first_name": "Meaghan",
+    "last_name": "Kiehn",
+    "email": "Meaghan.Kiehn@gmail.com",
+    "current_balance": 87795326,
+    "password": "$2b$10$1XHwMyOpM0NjhHdmmJ2z9ey.Ms0FyfTTUORfjSgIgTLvs0BlnD90.",
+    "account_number": 299692545
+  },
+  {
+    "user_id": 126,
+    "first_name": "Berneice",
+    "last_name": "Jast-Parker",
+    "email": "Berneice_Jast-Parker@yahoo.com",
+    "current_balance": 30360200,
+    "password": "$2b$10$TsLaAbft0S9Kvl4FmLYQ7e/mRyhQmQazT1vMGSqARr9ugJncy5kgq",
+    "account_number": 435534947
+  },
+  {
+    "user_id": 127,
+    "first_name": "Kenton",
+    "last_name": "Strosin",
+    "email": "Kenton.Strosin@yahoo.com",
+    "current_balance": 2431787,
+    "password": "$2b$10$KQClxeO492Ns14EcxyPOPel0fYTbHS1R952sbINlg2BUnl9RV4yOK",
+    "account_number": 250870335
+  },
+  {
+    "user_id": 128,
+    "first_name": "Kaylin",
+    "last_name": "Kirlin",
+    "email": "Kaylin.Kirlin43@gmail.com",
+    "current_balance": 54080909,
+    "password": "$2b$10$5oetrupJEgYNh0BoeyrzHuwJ0kjihlvU/vpukFuwx3OL2t1EZraC2",
+    "account_number": 168732627
+  },
+  {
+    "user_id": 129,
+    "first_name": "Graham",
+    "last_name": "Treutel",
+    "email": "Graham_Treutel@yahoo.com",
+    "current_balance": 64462717,
+    "password": "$2b$10$9bsXCe4U64/4wPxKlepoReFXxiE2ir0o2V6KTPfuOlY1ZyLXakhMC",
+    "account_number": 163700320
+  }
+]
