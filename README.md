@@ -6,7 +6,13 @@ A horizontally-scalable mock banking API on a sharded, replicated MongoDB cluste
 for CSE512 (distributed systems) to measure how throughput and latency change as you add
 stateless app instances and shards.
 
-> Demo GIF: pending (see 4.3 in `IMPROVEMENT_PLAN.md`).
+> **TODO (4.3): demo GIF.** A login → transfer → history → CSV-download recording of
+> `UserInterface/` against a running backend is still missing. Attempted via browser
+> automation (Claude in Chrome) against the live docker-compose stack and a local
+> `http-server UserInterface/`, but the browser extension wasn't connected in that
+> environment, so no recording could be captured. Record manually (`make up`, `make
+> frontend`, walk through login → transfer → history → CSV export while screen-recording)
+> and drop the GIF at `docs/demo.gif`, then replace this note with `![demo](docs/demo.gif)`.
 
 ## Architecture
 
