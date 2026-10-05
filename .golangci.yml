@@ -1,0 +1,17 @@
+version: "2"
+
+# Deliberately minimal starting linter set (IMPROVEMENT_PLAN §2.4): the goal
+# is a green CI badge from day one, not retrofitting every pre-existing
+# errcheck nit at once. govet/ineffassign/staticcheck catch real bugs;
+# errcheck and unused are left off for now — this codebase has many
+# deliberately-ignored defer Close() errors and responsetime/main.go has
+# functions intentionally dead until uncommented in main() (see its header
+# comment and CLAUDE.md's "Load / response-time harness" section) — both
+# would need real cleanup to turn on cleanly, tracked under §3.3 (load
+# harness rework) rather than done piecemeal here.
+linters:
+  default: none
+  enable:
+    - govet
+    - ineffassign
+    - staticcheck

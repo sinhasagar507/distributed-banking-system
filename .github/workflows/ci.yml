@@ -1,0 +1,98 @@
+name: CI
+
+# IMPROVEMENT_PLAN.md §2.4: lint -> vet -> unit tests -> compose up (the real
+# sharded cluster, not a single mongod service container, since the sharding
+# topology is the project's point) -> integration + concurrency tests ->
+# teardown. golangci-lint and go vet run independently of the rest so a lint
+# nit doesn't block the (expensive) cluster bring-up from reporting.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  lint-and-vet:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.1"
+      - name: go vet
+        run: go vet ./...
+      - name: gofmt check
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "The following files are not gofmt-formatted:"
+            echo "$unformatted"
+            exit 1
+          fi
+      - uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.1"
+      # internal/auth and internal/service are pure unit tests (fake store,
+      # no DB) — see IMPROVEMENT_PLAN §2.1. They don't need the cluster below.
+      - name: Unit tests
+        run: go test ./internal/... -v -count=1
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: [lint-and-vet, unit-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.1"
+
+      # Brings up the full sharded cluster (3 config servers, 3 shards x 3
+      # nodes, 3 routers, mongo-init, 3 app instances, nginx) and seeds it
+      # from the committed scripts/seed/sample/ dataset (§0.5) — this is the
+      # same stack a contributor runs locally with `docker compose up`.
+      - name: docker compose up
+        run: docker compose up -d --build
+
+      # app-1/2/3 each depend_on mongo-init with condition:
+      # service_completed_successfully (docker-compose.yml), so compose
+      # itself refuses to start them until seeding succeeds — polling the app
+      # tier is sufficient proof mongo-init already finished cleanly; no need
+      # to separately poll its (stopped, so hidden from `compose ps` without
+      # `-a`) container state.
+      - name: Wait for the app tier to answer
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf -o /dev/null -w '%{http_code}' -X OPTIONS http://localhost:8080/login | grep -q 200; then
+              echo "App tier is up."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "App tier did not come up in time."
+          docker compose logs mongo-init app-1 nginx
+          exit 1
+
+      # Integration tests (IMPROVEMENT_PLAN §2.3, env-driven) and the
+      # concurrency/conservation-of-money proof (§2.2) against the real
+      # cluster — this is the actual point of bringing up compose in CI
+      # rather than a lighter mongod service container.
+      - name: Integration + concurrency tests
+        run: go test ./testing/... -v -count=1
+        env:
+          API_BASE_URL: http://localhost:8080
+
+      - name: docker compose logs (on failure)
+        if: failure()
+        run: docker compose logs
+
+      - name: docker compose down
+        if: always()
+        run: docker compose down -v
