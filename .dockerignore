@@ -1,0 +1,25 @@
+# Version control
+.git
+.gitignore
+
+# Dependencies (restored in the build, not copied from host)
+node_modules/
+vendor/
+
+# Generated mock data
+mock_data_userInfo.json
+mock_data_userInfo_pwd.json
+mock_transactions.json
+
+# Build artifacts
+*.exe
+/server
+
+# Benchmark output
+/benchmarks/raw/
+
+# OS / editor files
+.DS_Store
+
+# Docs (not needed in the image)
+*.md
