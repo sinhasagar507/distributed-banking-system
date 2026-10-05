@@ -1,8 +1,11 @@
 document.addEventListener('DOMContentLoaded', function () {
   const app = document.getElementById('app');
-
+  const allowedPorts = [8080];
   let userData = null;
+  let authToken = null; // JWT from /login; sent as Authorization: Bearer on every other call
 
+  const selectedPort = allowedPorts[Math.floor(Math.random() * allowedPorts.length)];
+  const baseURL = `http://localhost:${selectedPort}`;
   const staticTransactions = [
     { date: '2024-01-01', description: 'Deposit', amount: '$500' },
     { date: '2024-01-02', description: 'Withdrawal', amount: '$100' },
@@ -10,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   function renderLoginForm() {
     app.innerHTML = `
-      <h1>Welcome to MyBank</h1>
+      <h1>Welcome to DISBank</h1>
       <form id="loginForm">
         <input type="text" id="userId" placeholder="User ID" required />
         <input type="email" id="email" placeholder="Email" required />
@@ -31,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const password = document.getElementById('password').value;
 
       try {
-        const response = await fetch('http://localhost:8080/login', {
+        const response = await fetch(`${baseURL}/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ user_id: userId, email, password }),
@@ -39,8 +42,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (response.ok) {
           userData = (await response.json()).data;
+          authToken = userData.token;
+          // API amounts/balances are integer cents; the UI works in dollars.
+          userData.balance = userData.balance / 100;
+          console.log(userData);
           userData.user_id = userId;
-          userData.password = password ;
           renderDashboard();
         } else {
           errorMessage.style.display = 'block';
@@ -71,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
           </tr>
           <tr>
             <th>Account Number:</th>
-            <td>${userData.accountNumber}</td>
+            <td>${userData.account_number}</td>
           </tr>
           <tr>
             <th>Current Balance:</th>
@@ -85,6 +91,42 @@ document.addEventListener('DOMContentLoaded', function () {
         <h2>Transaction History</h2>
         <p>Loading transactions...</p>
       </div>
+
+      <div id="monthlyReportContainer">
+  <h2>Download Monthly Report</h2>
+  <form id="downloadForm" style="display: flex; align-items: center; gap: 10px;">
+    <label for="month" style="margin-right: 5px;">Month:</label>
+    <select id="month" required style="padding: 5px; border-radius: 5px; border: 1px solid #ccc;">
+      <option value="" disabled selected>Select</option>
+      <option value="1">January</option>
+      <option value="2">February</option>
+      <option value="3">March</option>
+      <option value="4">April</option>
+      <option value="5">May</option>
+      <option value="6">June</option>
+      <option value="7">July</option>
+      <option value="8">August</option>
+      <option value="9">September</option>
+      <option value="10">October</option>
+      <option value="11">November</option>
+      <option value="12">December</option>
+    </select>
+    <label for="year" style="margin-left: 10px; margin-right: 5px;">Year:</label>
+    <input
+      type="number"
+      id="year"
+      min="2020"
+      max="2100"
+      required
+      placeholder="e.g. 2023"
+      style="padding: 5px; width: 100px; border-radius: 5px; border: 1px solid #ccc;"
+    />
+    <button type="submit" style="padding: 5px 10px; border-radius: 5px; background-color: #0066cc; color: white; border: none; cursor: pointer;">
+      Download Now
+    </button>
+  </form>
+</div>
+
       <button id="logout">Logout</button>
     `;
 
@@ -94,12 +136,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.getElementById('sendMoneyButton').addEventListener('click', openSendMoneyForm);
+    document.getElementById('downloadForm').addEventListener('submit', downloadMonthlyReport);
 
     try {
       console.log(userData) ;
       const transactionsResponse = await fetch(
-        `http://localhost:8080/transactions?sender_id=${userData.user_id}`,
-        { method: 'GET', headers: { 'Content-Type': 'application/json' } }
+        `${baseURL}/transactions`,
+        { method: 'GET', headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` } }
       );
 
       let transactions = staticTransactions;
@@ -224,28 +267,28 @@ document.addEventListener('DOMContentLoaded', function () {
         );
   
         if (confirmation) {
-          // Prepare the payload for the transaction
+          // Prepare the payload for the transaction (API amounts are integer cents)
           const payload = {
             sender_id: parseInt(userData.user_id),
             receiver_id: receiverId,
             account_number: receiverAccount,
-            amount: amount,
+            amount: Math.round(amount * 100),
             remarks: `Transfer of $${amount.toFixed(2)} from ${userData.name} to ${receiverNameInput.value}`,
             dateTimeStamp: Math.floor(Date.now() / 1000), // Current Unix timestamp
           };
   
           try {
             // Hit the /handletransaction API
-            const response = await fetch('http://localhost:8080/transaction', {
+            const response = await fetch(`${baseURL}/transaction`, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
               body: JSON.stringify(payload),
             });
   
             if (response.ok) {
               alert('Transaction completed successfully!');
               formContainer.innerHTML = '';
-              userData.balance = (await response.json()).updated_balance ;
+              userData.balance = (await response.json()).updated_balance / 100;
               renderDashboard() ;
               // After transaction, refresh the transactions and dashboard
               //await fetchTransactionsAndUpdateState();
@@ -284,22 +327,22 @@ document.addEventListener('DOMContentLoaded', function () {
         <tbody>
           ${transactions
             .map((txn) => {
-              let amount = txn.amount;
+              let amount = txn.amount / 100; // API amounts are integer cents
 
               // Check if the transaction is a transfer and the current user is the sender
               if (txn.remarks.includes("Transfer") && txn.remarks.includes(`from ${userData.name}`)) {
-                amount = -Math.abs(txn.amount); // Make the amount negative if the user is the sender
+                amount = -Math.abs(amount); // Make the amount negative if the user is the sender
               }
 
               // Format the amount for display
               const amountStyle = amount < 0 ? 'color: red;' : '';
-              const statusIcon = txn.status === 'completed' ? '✔' : '✘';
+              const statusIcon = (txn.status == 'completed' || txn.status == 'success') ? '✔' : '✘';
 
               return `
                 <tr>
                   <td>${new Date(txn.dateTimeStamp * 1000).toLocaleDateString()}</td>
                   <td>${txn.remarks}</td>
-                  <td style="${amountStyle}">${amount < 0 ? '-' : ''}$${Math.abs(amount)}</td>
+                  <td style="${amountStyle}">${amount < 0 ? '-' : ''}$${Math.abs(amount).toFixed(2)}</td>
                   <td style="text-align: center;">${statusIcon}</td>
                 </tr>
               `;
@@ -312,6 +355,41 @@ document.addEventListener('DOMContentLoaded', function () {
   function validateEmail(email) {
     const re = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return re.test(String(email).toLowerCase());
+  }
+  function downloadMonthlyReport(e) {
+    e.preventDefault();
+
+    const month = document.getElementById('month').value;
+    const year = document.getElementById('year').value;
+
+    if (!month || !year) {
+      alert('Please enter a valid month and year.');
+      return;
+    }
+
+    const url = `${baseURL}/monthdata?month=${month}&year=${year}`;
+    fetch(url, { headers: { 'Authorization': `Bearer ${authToken}` } })
+      .then((response) => {
+        if (!response.ok) {
+          return response.json().then((data) => {
+            throw new Error(data.message || 'Failed to fetch the report');
+          });
+        }
+        return response.blob();
+      })
+      .then((blob) => {
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = `Monthly_Report_${month}_${year}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      })
+      .catch((error) => {
+        console.error('Error downloading report:', error);
+        alert(error.message);
+      });
   }
 
   renderLoginForm();
