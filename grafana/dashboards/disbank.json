@@ -1,0 +1,66 @@
+{
+  "title": "DISBank — request latency & errors",
+  "uid": "disbank-overview",
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": true,
+  "refresh": "5s",
+  "time": { "from": "now-15m", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "p50 / p95 / p99 latency by route",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum by (le, route) (rate(http_request_duration_seconds_bucket[1m])))",
+          "legendFormat": "p50 {{route}}",
+          "datasource": { "type": "prometheus", "uid": "Prometheus" }
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum by (le, route) (rate(http_request_duration_seconds_bucket[1m])))",
+          "legendFormat": "p95 {{route}}",
+          "datasource": { "type": "prometheus", "uid": "Prometheus" }
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum by (le, route) (rate(http_request_duration_seconds_bucket[1m])))",
+          "legendFormat": "p99 {{route}}",
+          "datasource": { "type": "prometheus", "uid": "Prometheus" }
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] }
+    },
+    {
+      "id": 2,
+      "title": "Request rate by route/status",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 12, "x": 0, "y": 9 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (route, status) (rate(http_requests_total[1m]))",
+          "legendFormat": "{{route}} {{status}}",
+          "datasource": { "type": "prometheus", "uid": "Prometheus" }
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] }
+    },
+    {
+      "id": 3,
+      "title": "Error rate (4xx/5xx) by route",
+      "type": "timeseries",
+      "gridPos": { "h": 9, "w": 12, "x": 12, "y": 9 },
+      "datasource": { "type": "prometheus", "uid": "Prometheus" },
+      "targets": [
+        {
+          "expr": "sum by (route) (rate(http_requests_total{status=~\"4..|5..\"}[1m]))",
+          "legendFormat": "{{route}}",
+          "datasource": { "type": "prometheus", "uid": "Prometheus" }
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] }
+    }
+  ]
+}

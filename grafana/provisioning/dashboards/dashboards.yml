@@ -1,0 +1,10 @@
+# Auto-loads every dashboard JSON committed under grafana/dashboards/ on
+# Grafana startup (IMPROVEMENT_PLAN §3.2), so the dashboard is reproducible
+# from the repo rather than a manually-recreated one-off.
+apiVersion: 1
+
+providers:
+  - name: DISBank
+    type: file
+    options:
+      path: /var/lib/grafana/dashboards

@@ -1,0 +1,13 @@
+# Scrapes each app instance directly, not through nginx (IMPROVEMENT_PLAN
+# §3.2) — the whole point of running N identical instances is per-instance
+# observability (e.g. spotting one instance lagging the others under load),
+# which a single nginx-fronted target would hide.
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: disbank-app
+    static_configs:
+      - targets: ["app-1:8080", "app-2:8080", "app-3:8080"]
+        labels:
+          service: disbank

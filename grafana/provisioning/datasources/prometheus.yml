@@ -1,0 +1,10 @@
+# Auto-provisions the Prometheus datasource so the committed dashboard JSON
+# (IMPROVEMENT_PLAN §3.2) loads with no manual Grafana UI setup.
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://prometheus:9090
+    isDefault: true
